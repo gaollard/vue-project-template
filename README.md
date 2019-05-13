@@ -1,6 +1,6 @@
 # vue-project
 
-vue 模板
+vue 模板。如是开发618活动，请见 src/projects/kele618
 
 ## quickstart
 
