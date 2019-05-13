@@ -1,4 +1,7 @@
 'use strict'
-module.exports = {
+const config = require('./index')
+const merge = require('webpack-merge')
+
+module.exports = merge({
   NODE_ENV: '"production"'
-}
+}, config.projectConfig.env)

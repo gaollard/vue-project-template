@@ -1,10 +1,10 @@
 'use strict'
 // Template version: 1.3.1
 // see http://vuejs-templates.github.io/webpack for documentation.
-
 const path = require('path')
 const minimist = require('minimist');
 const chalk = require('chalk')
+const merge = require('webpack-merge')
 
 const getParamFromCLI = function (cliName) {
   const args = minimist(process.argv.slice(2));
@@ -16,7 +16,6 @@ const getParamFromCLI = function (cliName) {
 }
 
 let projectName = getParamFromCLI('projectname') || getParamFromCLI()._[0];
-
 if (!projectName) {
   console.log(chalk.red('please type a valid projectname. eg: node build/dev-server.js --projectname kele'));
   process.exit(1);
@@ -25,11 +24,20 @@ if (!projectName) {
 process.env.projectName = projectName
 
 // 默认构建配置
-const rootConfig = require(`../src/config/project.config`)
-// 项目构建配置
-const projectConfig = require(`../src/projects/${process.env.projectName}/project.config`)
+let rootConfig = require(`../src/config/project.config`)
+try {
+  const projectConfig = require(`../src/projects/${process.env.projectName}/project.config`)
+  rootConfig = merge(rootConfig, projectConfig)
+} catch (error) {
+  console.log(chalk.red('warn: project.config dose not exist'))
+}
+
+// 获取CDN
+const publicPath = rootConfig.publicPath || `/${projectName}/`;
 
 module.exports = {
+  projectName,
+  projectConfig: rootConfig,
   dev: {
 
     // Paths
@@ -76,7 +84,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, `../dist/${process.env.projectName}`),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '//s1.huishoubao.com/',
+    assetsPublicPath: publicPath,
 
     /**
      * Source Maps
